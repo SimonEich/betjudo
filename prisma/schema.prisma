@@ -1,17 +1,29 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-    provider = "prisma-client-js"
-}
-
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+generator client {
+  provider = "prisma-client-js"
+}
+
+model BetDB {
+  id              String    @id @default(cuid())
+  createdAt       DateTime  @default(now())
+
+  
+  bet1            String
+  bet2            String
+  bet3            String
+  bet4            String
+  bet5            String
+  bet6            String
+  bet7            String
+  bet8            String
+  bet9            String        
+
 }
