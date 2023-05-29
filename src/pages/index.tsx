@@ -5,17 +5,53 @@ import Head from "next/head";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import Link from "next/link";
+import Image from "next/image";
 
 import { api } from "~/utils/api";
+import { RouterOutputs } from "~/utils/api";
 
 dayjs.extend(relativeTime);
 
+const CreatePostWizard = () => {
+
+const {user} = useUser();
+
+
+if (!user) return null;
+
+
+return <div >
+  <Image className="rounded-full" src={user.profileImageUrl} width={56} height={56} alt="" />
+</div>
+
+}
+
+type PostWithUser = RouterOutputs["posts"]["getAll"][number]
+
+const PostView = (props: PostWithUser) => {
+  const { post, author } = props;
+  return (
+          <div key={post.id} className="border-b border-slate-400 p-8">
+              <img className="h-14 w-14 rounded-full" src={author.profilePicture}  width={56} height={56} />
+              {post.bet1}
+              <span>  @{author?.username}</span>
+              <span> - {dayjs(post.createdAt).fromNow()}</span>
+            </div>
+  );
+
+}
+
 const Home: NextPage = () => {
-
-  const user = useUser();
-
   
-  const {data} = api.posts.getAll.useQuery();
+  const user = useUser();
+  
+  const {data, isLoading} = api.posts.getAll.useQuery();
+  
+  if (isLoading) return <div>Loading...</div>
+  if (!data) return <div>Something went wrong!</div>
+  
+  console.log(user.user?.id);
+
   console.log(user.user?.profileImageUrl);
 
   const imgURL = user.user?.profileImageUrl;
@@ -64,23 +100,39 @@ const Home: NextPage = () => {
         </div>
     </div>
 </nav>
-
+<div className="m-5 flex justify-center border-x sc w-full md:max-w-200">
+  <CreatePostWizard />
+</div>
+<div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-200">
+  <input className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+    placeholder="Content" 
+    type="text" />
+  <button className="m-3 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+    Submit
+  </button>
+</div>
 
 
        
      
         
-        <div className="justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-20">
-          {data?.map((post) =>(<p key={post.id}>{post.bet1}</p>
+        <div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-20">
+          {data?.map((post) =>(<p key={post.author?.id}>{post.post.bet1}</p>
           ))}
         
         <p>footer</p>
+        <div className="flex flex-col">
+          {[...data, ...data]?.map((fullPost) => (
+            <PostView {...fullPost} key={fullPost.post.id}/>
+          ))}
+    
+        </div>
         </div>
 
 
       </main>
     </>
   );
-};
+};  
 
 export default Home;
