@@ -9,6 +9,7 @@ import Image from "next/image";
 
 import { api } from "~/utils/api";
 import { RouterOutputs } from "~/utils/api";
+import { LoadingPage} from "~/components/loading";
 
 dayjs.extend(relativeTime);
 
@@ -41,20 +42,34 @@ const PostView = (props: PostWithUser) => {
 
 }
 
+
+const Feed = () => {
+  const {data, isLoading: postsLoading, } = api.posts.getAll.useQuery();
+
+  if (postsLoading) return <LoadingPage />;
+
+  if (!data) return <div>Something went wrong</div>
+
+
+  return (
+    <div className="flex flex-col">
+          {[...data, ...data]?.map((fullPost) => (
+            <PostView {...fullPost} key={fullPost.post.id}/>
+          ))}
+    </div>
+  )
+
+}
+
+
 const Home: NextPage = () => {
   
-  const user = useUser();
+  const { isLoaded: userLoaded, isSignedIn} = useUser();
+  api.posts.getAll.useQuery();
   
-  const {data, isLoading} = api.posts.getAll.useQuery();
+  const {data} = api.posts.getAll.useQuery();
   
-  if (isLoading) return <div>Loading...</div>
-  if (!data) return <div>Something went wrong!</div>
-  
-  console.log(user.user?.id);
-
-  console.log(user.user?.profileImageUrl);
-
-  const imgURL = user.user?.profileImageUrl;
+  if (!userLoaded) return <div></div>;
  
 
   return (
@@ -73,8 +88,8 @@ const Home: NextPage = () => {
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">JudoBet</span>
                 <div className="flex items-center">
             <a href="#" className="text-sm  text-blue-600 dark:text-blue-500 hover:underline">
-              {!user.isSignedIn&&<SignInButton />}
-              {!!user.isSignedIn&&<UserButton/>}
+              {!isSignedIn&&<SignInButton />}
+              {!!isSignedIn&&<UserButton/>}
               <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
               </a>
         </div>
@@ -121,11 +136,8 @@ const Home: NextPage = () => {
           ))}
         
         <p>footer</p>
-        <div className="flex flex-col">
-          {[...data, ...data]?.map((fullPost) => (
-            <PostView {...fullPost} key={fullPost.post.id}/>
-          ))}
-    
+        <div>
+          <Feed />
         </div>
         </div>
 
