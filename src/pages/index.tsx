@@ -10,31 +10,67 @@ import Image from "next/image";
 import { api } from "~/utils/api";
 import { RouterOutputs } from "~/utils/api";
 import { LoadingPage} from "~/components/loading";
+import { useState } from "react";
+import input from "postcss/lib/input";
+import { TRPCError } from "@trpc/server";
+import { prisma } from "~/server/db";
 
-dayjs.extend(relativeTime);
+
+
 
 const CreatePostWizard = () => {
+dayjs.extend(relativeTime);
 
 const {user} = useUser();
 
+const [input, setInput] = useState("");
+
+const ctx = api.useContext();
+
+
+const {mutate, isLoading : isPosting} = api.posts.create.useMutation({
+  onSuccess: () =>{
+  setInput("")
+  void ctx.posts.getAll.invalidate()
+}
+}
+);
+
+
 
 if (!user) return null;
+console.log(user);
 
 
-return <div >
+
+return (<div >
   <Image className="rounded-full" src={user.profileImageUrl} width={56} height={56} alt="" />
+  
+  
+  <div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-200">
+  <input
+        placeholder="Content"
+        className="grow bg-transparent outline-none"
+        type="text"
+        value= {input}
+        onChange={(e) => setInput(e.target.value)}
+        disabled={isPosting}
+        />
+ <button onClick={() => mutate({content : input})} >Post</button>
 </div>
+</div> 
+);
 
-}
+};
 
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 
 const PostView = (props: PostWithUser) => {
   const { post, author } = props;
   return (
-          <div key={post.id} className="border-b border-slate-400 p-8">
+    <div key={post.id} className="border-b border-slate-400 p-8">
               <img className="h-14 w-14 rounded-full" src={author.profilePicture}  width={56} height={56} />
-              {post.bet1}
+              {post.content}
               <span>  @{author?.username}</span>
               <span> - {dayjs(post.createdAt).fromNow()}</span>
             </div>
@@ -42,9 +78,8 @@ const PostView = (props: PostWithUser) => {
 
 }
 
-
 const Feed = () => {
-  const {data, isLoading: postsLoading, } = api.posts.getAll.useQuery();
+  const {data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
   if (postsLoading) return <LoadingPage />;
 
@@ -52,10 +87,10 @@ const Feed = () => {
 
 
   return (
-    <div className="flex flex-col">
-          {[...data, ...data]?.map((fullPost) => (
-            <PostView {...fullPost} key={fullPost.post.id}/>
-          ))}
+    <div className="flex grow flex-col overflow-y-scroll">
+      {[...data].map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
     </div>
   )
 
@@ -64,13 +99,17 @@ const Feed = () => {
 
 const Home: NextPage = () => {
   
+  const {data} = api.posts.getAll.useQuery();
   const { isLoaded: userLoaded, isSignedIn} = useUser();
   api.posts.getAll.useQuery();
   
-  const {data} = api.posts.getAll.useQuery();
   
   if (!userLoaded) return <div></div>;
- 
+  // 
+
+  function setInput(value: string): void {
+    throw new Error("SetInput mistake");
+  }
 
   return (
     <>
@@ -118,29 +157,16 @@ const Home: NextPage = () => {
 <div className="m-5 flex justify-center border-x sc w-full md:max-w-200">
   <CreatePostWizard />
 </div>
-<div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-200">
-  <input className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-    placeholder="Content" 
-    type="text" />
-  <button className="m-3 bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-    Submit
-  </button>
-</div>
 
-
-       
-     
         
         <div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-20">
-          {data?.map((post) =>(<p key={post.author?.id}>{post.post.bet1}</p>
+          {data?.map((post) =>(<p >{post.post.content}</p>
           ))}
-        
-        <p>footer</p>
+        </div>
+
         <div>
           <Feed />
         </div>
-        </div>
-
 
       </main>
     </>

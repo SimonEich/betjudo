@@ -15,17 +15,8 @@ model Post {
   id              String    @id @default(cuid())
   createdAt       DateTime  @default(now())
   authorId        String
-
-  
-  bet1            String
-  bet2            String
-  bet3            String
-  bet4            String
-  bet5            String
-  bet6            String
-  bet7            String
-  bet8            String
-  bet9            String      
+  content         String
+   
 
   @@index([authorId])  
 
