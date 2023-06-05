@@ -39,7 +39,6 @@ const {mutate, isLoading : isPosting} = api.posts.create.useMutation({
 
 
 if (!user) return null;
-console.log(user);
 
 
 
@@ -54,6 +53,14 @@ return (<div >
         type="text"
         value= {input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") {
+              mutate({ content: input });
+            }
+          }
+        }}
         disabled={isPosting}
         />
  <button onClick={() => mutate({content : input})} >Post</button>
