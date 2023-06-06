@@ -1,19 +1,13 @@
-import { SignIn, SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { log } from "console";
+import { SignIn, SignInButton, UserButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
-import Link from "next/link";
 import Image from "next/image";
-
 import { api } from "~/utils/api";
 import { RouterOutputs } from "~/utils/api";
 import { LoadingPage} from "~/components/loading";
 import { useState } from "react";
-import input from "postcss/lib/input";
-import { TRPCError } from "@trpc/server";
-import { prisma } from "~/server/db";
 
 
 
@@ -76,7 +70,7 @@ const PostView = (props: PostWithUser) => {
   const { post, author } = props;
   return (
     <div key={post.id} className="border-b border-slate-400 p-8">
-              <img className="h-14 w-14 rounded-full" src={author.profilePicture}  width={56} height={56} />
+              <Image className="h-14 w-14 rounded-full" src={author.profilePicture}   width={56} height={56} alt="" />
               {post.content}
               <span>  @{author?.username}</span>
               <span> - {dayjs(post.createdAt).fromNow()}</span>
@@ -166,11 +160,7 @@ const Home: NextPage = () => {
 </div>
 
         
-        <div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-20">
-          {data?.map((post) =>(<p >{post.post.content}</p>
-          ))}
-        </div>
-
+       
         <div>
           <Feed />
         <h1>hello World</h1>
@@ -181,3 +171,8 @@ const Home: NextPage = () => {
 };  
 
 export default Home;
+
+//<div className="flex justify-between items-center mx-auto max-w-screen-xl p-4 bg-slate-20">
+//{data?.map((post) =>(<p >{post.post.content}</p>
+//))}
+//</div>
