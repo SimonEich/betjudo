@@ -143,7 +143,6 @@ const Home: NextPage = () => {
 </nav>
 <nav className="bg-gray-100 dark:bg-gray-700">
     <div className="max-w-screen-xl px-4 py-3 mx-auto">
-        <h1>hello World</h1>
         <div className="flex items-center">
             <ul className="flex flex-row font-medium mt-0 mr-6 space-x-8 text-sm">
                 <li>
@@ -174,8 +173,7 @@ const Home: NextPage = () => {
 
         <div>
           <Feed />
-        </div>
-
+        <h1>hello World</h1>
       </main>
     </>
   );
