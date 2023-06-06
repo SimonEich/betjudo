@@ -174,6 +174,7 @@ const Home: NextPage = () => {
         <div>
           <Feed />
         <h1>hello World</h1>
+        </div>
       </main>
     </>
   );
