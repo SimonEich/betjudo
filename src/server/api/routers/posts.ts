@@ -1,6 +1,7 @@
 import { clerkClient } from "@clerk/nextjs";
 import { User } from "@clerk/nextjs/dist/server";
 import { TRPCError } from "@trpc/server";
+import { TypeScriptConfig } from "next/dist/server/config-shared";
 import { z } from "zod";
 
 import { createTRPCRouter, privateProcedure, publicProcedure } from "~/server/api/trpc";
