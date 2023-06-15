@@ -8,17 +8,22 @@ import { api } from "~/utils/api";
 import { RouterOutputs } from "~/utils/api";
 import { LoadingPage} from "~/components/loading";
 import { useState } from "react";
+import { users } from "@clerk/nextjs/dist/api";
+
+
 
 
 
 
 const CreatePostWizard = () => {
-dayjs.extend(relativeTime);
-
-const {user} = useUser();
-
-const [input, setInput] = useState("");
-
+  dayjs.extend(relativeTime);
+  
+  const {user} = useUser();
+  console.log(user);
+  
+  
+  const [input, setInput] = useState("");
+  
 const ctx = api.useContext();
 
 
@@ -64,25 +69,28 @@ return (<div >
 
 };
 
+
+
 type PostWithUser = RouterOutputs["posts"]["getAll"][number]
 
 const PostView = (props: PostWithUser) => {
   const { post, author } = props;
+  console.log(author);
   return (
     <div key={post.id} className="border-b border-slate-400 p-8">
               <Image className="h-14 w-14 rounded-full" src={author.profilePicture}   width={56} height={56} alt="" />
               {post.content}
-              <span>  @{author?.username}</span>
+              <span>  @{author?.username || author?.fullname}</span>
               <span> - {dayjs(post.createdAt).fromNow()}</span>
             </div>
   );
 
 }
-
 const Feed = () => {
   const {data, isLoading: postsLoading } = api.posts.getAll.useQuery();
 
   if (postsLoading) return <LoadingPage />;
+ 
 
   if (!data) return <div>Something went wrong</div>
 
