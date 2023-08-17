@@ -44,6 +44,7 @@ export const postsRouter = createTRPCRouter({
       ...author,
       username: author.username,
       fullname: author.fullname,
+      profilePicture: author.profilePicture,
      },
     };
   });
